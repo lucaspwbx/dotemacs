@@ -413,6 +413,10 @@
 (defun efs/exwm-update-class ()
   (exwm-workspace-rename-buffer exwm-class-name))
 
+(defun exwm-x/new-terminal ()
+  (interactive)
+  (start-process-shell-command "kitty foo" nil "kitty"))
+
 (use-package exwm
   :config
   ;; Set the default number of workspaces
@@ -466,6 +470,8 @@
                        (interactive (list (read-shell-command "$ ")))
                        (start-process-shell-command command nil command)))
 
+	  ([?\s-k] . exwm-x/new-terminal)
+
           ;; Switch workspace
           ([?\s-w] . exwm-workspace-switch)
           ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
@@ -480,16 +486,105 @@
 
   (exwm-enable))
 
+
+(use-package avy
+  :bind (("C-:" . 'avy-goto-char)))
+
+(use-package ivy-avy)
+
+(use-package org-roam
+      :ensure t
+      :hook
+      (after-init . org-roam-mode)
+      :custom
+      (org-roam-directory "~/Projects")
+      :bind (:map org-roam-mode-map
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))
+              (("C-c n I" . org-roam-insert-immediate))))
+
+;; testing
+(defun zp/kill-other-buffer-and-window ()
+  "Kill the other buffer and window if there is more than one window."
+  (interactive)
+  (if (not (one-window-p))
+      (progn
+        (select-window (next-window))
+        (kill-buffer-and-window))
+    (user-error "There is only one window in the frame")))
+
+
+(use-package forge
+  :after magit)
+
+(use-package auth-source
+  :custom
+  ;; Path to authentication sources
+  (auth-sources '("~/.authinfo.gpg" "~/.netrc"))
+  (auth-source-save-behavior nil))
+
+(use-package undo-tree
+  :init
+  (global-undo-tree-mode)
+  :custom
+  (undo-tree-enable-undo-in-region nil))
+
+(use-package rg
+  :ensure t
+  :commands rg
+  :bind (("M-s ," . rg-dwim)
+         ("s-SPC" . rg)))
+
+(use-package yasnippet
+  :config
+  (yas-global-mode 1)
+  (global-set-key (kbd "s-<backspace>") 'yas-prev-field))
+
+(use-package pdf-tools
+  :config
+  (pdf-tools-install :no-query)
+  (setq-default pdf-view-display-size 'fit-width)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  :custom
+  (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
+
+(require 'pdf-view)
+(use-package pdf-view-mode
+  :ensure nil
+  :bind ("M-f" . pdf-view-first-page))
+
+(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
+
+(use-package lsp-latex
+  :hook (lsp-mode . tex-mode))
+
+;; source: http://alberto.am/2020-04-11-pdf-tools-as-default-pdf-viewer.html
+(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+      TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+      TeX-source-correlate-start-server t)
+
+(add-hook 'TeX-after-compilation-finished-functions
+          #'TeX-revert-document-buffer)
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(lsp-mode org-superstar-mode hydra helpful counsel ivy-rich ivy which-key doom-modeline all-the-icons evil-collection evil general use-package)))
+   '(pdf-view-mode keepass-mode auctex latex org-roam ivy-avy lsp-mode org-superstar-mode hydra helpful counsel ivy-rich ivy which-key doom-modeline all-the-icons evil-collection evil general use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+(use-package keepass-mode)
+
+(require 'epa-file)
+(epa-file-enable)
