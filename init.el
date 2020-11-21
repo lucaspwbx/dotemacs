@@ -63,7 +63,6 @@
     "t"  '(:ignore t :which-key "toggles")
     "tt" '(counsel-load-theme :which-key "choose theme")))
 
-
 (use-package evil
   :init
   (setq evil-want-integration t)
@@ -337,10 +336,7 @@
 
 (use-package term
   :config
-  (setq explicit-shell-file-name "bash") ;; Change this to zsh, etc
-  ;;(setq explicit-zsh-args '())         ;; Use 'explicit-<shell>-args for shell-specific args
-
-  ;; Match the default Bash shell prompt.  Update this if you have a custom prompt
+  (setq explicit-shell-file-name "bash")
   (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
 
 (use-package eterm-256color
@@ -349,8 +345,7 @@
 (use-package vterm
   :commands vterm
   :config
-  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  ;; Set this to match your custom shell prompt
-  ;;(setq vterm-shell "zsh")                       ;; Set this to customize the shell to launch
+  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
   (setq vterm-max-scrollback 10000))
 
 (defun efs/configure-eshell ()
@@ -486,7 +481,6 @@
 
   (exwm-enable))
 
-
 (use-package avy
   :bind (("C-:" . 'avy-goto-char)))
 
@@ -515,7 +509,6 @@
         (select-window (next-window))
         (kill-buffer-and-window))
     (user-error "There is only one window in the frame")))
-
 
 (use-package forge
   :after magit)
@@ -569,14 +562,13 @@
 (add-hook 'TeX-after-compilation-finished-functions
           #'TeX-revert-document-buffer)
 
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(pdf-view-mode keepass-mode auctex latex org-roam ivy-avy lsp-mode org-superstar-mode hydra helpful counsel ivy-rich ivy which-key doom-modeline all-the-icons evil-collection evil general use-package)))
+   '(dmenu example pdf-view-mode keepass-mode auctex latex org-roam ivy-avy lsp-mode org-superstar-mode hydra helpful counsel ivy-rich ivy which-key doom-modeline all-the-icons evil-collection evil general use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -588,3 +580,8 @@
 
 (require 'epa-file)
 (epa-file-enable)
+
+(use-package dmenu
+  :ensure t
+  :bind
+  ("s-SPC" . 'dmenu))
